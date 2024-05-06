@@ -39,17 +39,18 @@ app.post('/send-email', async (req, res) => {
 		const html = `<p>${sender_message}</p>`;
 
 		const transporter = nodemailer.createTransport({
-			host: process.env.SMTP_HOST, // My SMTP Server Host
-			port: process.env.SMTP_PORT, // My SMTP Server Port
+			host: process.env.SMTP_HOST,
+			port: process.env.SMTP_PORT,
+			secure: false,
 			auth: {
-				user: process.env.SMTP_MAIL_USER, // My SMTP Server Username
-				pass: process.env.SMTP_MAIL_PASSWORD, // My SMTP Server Password
+				user: process.env.SMTP_MAIL_USER,
+				pass: process.env.SMTP_MAIL_PASSWORD,
 			},
 		});
 
 		const info = await transporter.sendMail({
 			from: sender_email,
-			to: process.env.TO_EMAIL, // My Email
+			to: process.env.TO_EMAIL,
 			subject: `${sender_company_name}: ${sender_name}`,
 			html,
 		});
@@ -61,8 +62,12 @@ app.post('/send-email', async (req, res) => {
 			message: 'Email Sent',
 		});
 	} catch (error) {
-		console.log('Error Sending Mail');
-		console.log(error);
+		console.log(error.message);
+
+		res.status(400).json({
+			success: false,
+			message: 'Email Not Sent!',
+		});
 	}
 });
 
